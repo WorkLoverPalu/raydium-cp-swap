@@ -8,11 +8,11 @@ use anchor_spl::token_interface::Token2022;
 use anchor_spl::token_interface::TokenAccount;
 #[derive(Accounts)]
 pub struct CollectFundFee<'info> {
-    /// Only admin or fund_owner can collect fee now
+    /// 现在只有管理员或基金所有者可以收取费用
     #[account(constraint = (owner.key() == amm_config.fund_owner || owner.key() == crate::admin::id()) @ ErrorCode::InvalidOwner)]
     pub owner: Signer<'info>,
 
-    /// CHECK: pool vault and lp mint authority
+    /// 检查：金库和 lp 铸币机构
     #[account(
         seeds = [
             crate::AUTH_SEED.as_bytes(),
@@ -21,52 +21,52 @@ pub struct CollectFundFee<'info> {
     )]
     pub authority: UncheckedAccount<'info>,
 
-    /// Pool state stores accumulated protocol fee amount
+    /// 池状态存储累计协议费用金额
     #[account(mut)]
     pub pool_state: AccountLoader<'info, PoolState>,
 
-    /// Amm config account stores fund_owner
+    /// Amm 配置帐户存储fund_owner
     #[account(address = pool_state.load()?.amm_config)]
     pub amm_config: Account<'info, AmmConfig>,
 
-    /// The address that holds pool tokens for token_0
+    /// 持有 token_0 池代币的地址
     #[account(
         mut,
         constraint = token_0_vault.key() == pool_state.load()?.token_0_vault
     )]
     pub token_0_vault: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// The address that holds pool tokens for token_1
+    /// 保存 token_1 池代币的地址
     #[account(
         mut,
         constraint = token_1_vault.key() == pool_state.load()?.token_1_vault
     )]
     pub token_1_vault: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// The mint of token_0 vault
+    /// token_0金库的铸币厂
     #[account(
         address = token_0_vault.mint
     )]
     pub vault_0_mint: Box<InterfaceAccount<'info, Mint>>,
 
-    /// The mint of token_1 vault
+    /// token_1金库的铸币厂
     #[account(
         address = token_1_vault.mint
     )]
     pub vault_1_mint: Box<InterfaceAccount<'info, Mint>>,
 
-    /// The address that receives the collected token_0 fund fees
+    /// 收取token_0资金费用的地址
     #[account(mut)]
     pub recipient_token_0_account: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// The address that receives the collected token_1 fund fees
+    /// 收取token_1资金费用的地址
     #[account(mut)]
     pub recipient_token_1_account: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// The SPL program to perform token transfers
+    /// 执行代币传输的 SPL 程序
     pub token_program: Program<'info, Token>,
 
-    /// The SPL program 2022 to perform token transfers
+    /// SPL 计划 2022 执行代币转账
     pub token_program_2022: Program<'info, Token2022>,
 }
 

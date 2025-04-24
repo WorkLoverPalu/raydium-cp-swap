@@ -9,10 +9,10 @@ use anchor_spl::token_interface::{Mint, TokenAccount, TokenInterface};
 
 #[derive(Accounts)]
 pub struct Swap<'info> {
-    /// The user performing the swap
+    /// 执行交换的用户
     pub payer: Signer<'info>,
 
-    /// CHECK: pool vault and lp mint authority
+    /// 检查：金库和 lp 铸币机构
     #[account(
         seeds = [
             crate::AUTH_SEED.as_bytes(),
@@ -21,54 +21,54 @@ pub struct Swap<'info> {
     )]
     pub authority: UncheckedAccount<'info>,
 
-    /// The factory state to read protocol fees
+    /// 工厂状态读取协议费用
     #[account(address = pool_state.load()?.amm_config)]
     pub amm_config: Box<Account<'info, AmmConfig>>,
 
-    /// The program account of the pool in which the swap will be performed
+    /// 将执行交换的池的程序帐户
     #[account(mut)]
     pub pool_state: AccountLoader<'info, PoolState>,
 
-    /// The user token account for input token
+    /// 输入token的用户token账户
     #[account(mut)]
     pub input_token_account: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// The user token account for output token
+    /// 输出token的用户token账户
     #[account(mut)]
     pub output_token_account: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// The vault token account for input token
+    /// 输入代币的金库代币账户
     #[account(
         mut,
         constraint = input_vault.key() == pool_state.load()?.token_0_vault || input_vault.key() == pool_state.load()?.token_1_vault
     )]
     pub input_vault: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// The vault token account for output token
+    /// 输出代币的保管库代币账户
     #[account(
         mut,
         constraint = output_vault.key() == pool_state.load()?.token_0_vault || output_vault.key() == pool_state.load()?.token_1_vault
     )]
     pub output_vault: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// SPL program for input token transfers
+    /// 用于输入代币传输的 SPL 程序
     pub input_token_program: Interface<'info, TokenInterface>,
 
-    /// SPL program for output token transfers
+    /// 用于输出令牌传输的 SPL 程序
     pub output_token_program: Interface<'info, TokenInterface>,
 
-    /// The mint of input token
+    /// 输入代币的铸币
     #[account(
         address = input_vault.mint
     )]
     pub input_token_mint: Box<InterfaceAccount<'info, Mint>>,
 
-    /// The mint of output token
+    /// 输出代币的铸币
     #[account(
         address = output_vault.mint
     )]
     pub output_token_mint: Box<InterfaceAccount<'info, Mint>>,
-    /// The program account for the most recent oracle observation
+    /// 该程序记录了最近的预言机观察结果
     #[account(mut, address = pool_state.load()?.observation_key)]
     pub observation_state: AccountLoader<'info, ObservationState>,
 }
@@ -85,11 +85,11 @@ pub fn swap_base_input(ctx: Context<Swap>, amount_in: u64, minimum_amount_out: u
 
     let transfer_fee =
         get_transfer_fee(&ctx.accounts.input_token_mint.to_account_info(), amount_in)?;
-    // Take transfer fees into account for actual amount transferred in
+    // 根据实际转入金额考虑转账费用
     let actual_amount_in = amount_in.saturating_sub(transfer_fee);
     require_gt!(actual_amount_in, 0);
 
-    // Calculate the trade amounts and the price before swap
+    // 计算掉期前的交易金额和价格
     let (
         trade_direction,
         total_input_token_amount,
@@ -246,7 +246,7 @@ pub fn swap_base_input(ctx: Context<Swap>, amount_in: u64, minimum_amount_out: u
         &[&[crate::AUTH_SEED.as_bytes(), &[pool_state.auth_bump]]],
     )?;
 
-    // update the previous price to the observation
+    // 将之前的价格更新为观察值
     ctx.accounts.observation_state.load_mut()?.update(
         oracle::block_timestamp(),
         token_0_price_x64,

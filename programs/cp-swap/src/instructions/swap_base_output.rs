@@ -25,7 +25,7 @@ pub fn swap_base_output(
     )?;
     let actual_amount_out = amount_out_less_fee.checked_add(out_transfer_fee).unwrap();
 
-    // Calculate the trade amounts and the price before swap
+    // 计算掉期前的交易金额和价格
     let (
         trade_direction,
         total_input_token_amount,
@@ -108,7 +108,7 @@ pub fn swap_base_output(
         constant_after
     );
 
-    // Re-calculate the source amount swapped based on what the curve says
+    // 根据曲线所示重新计算交换的源数量
     let (input_transfer_amount, input_transfer_fee) = {
         let source_amount_swapped = u64::try_from(result.source_amount_swapped).unwrap();
         require_gt!(source_amount_swapped, 0);
@@ -185,7 +185,7 @@ pub fn swap_base_output(
         &[&[crate::AUTH_SEED.as_bytes(), &[pool_state.auth_bump]]],
     )?;
 
-    // update the previous price to the observation
+    // 将之前的价格更新为观察值
     ctx.accounts.observation_state.load_mut()?.update(
         oracle::block_timestamp(),
         token_0_price_x64,

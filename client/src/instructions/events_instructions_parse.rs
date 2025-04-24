@@ -19,9 +19,10 @@ pub enum InstructionDecodeType {
     Base58,
 }
 
+// 解析程序执行日志中的事件数据
 pub fn parse_program_event(
-    self_program_str: &str,
-    meta: Option<UiTransactionStatusMeta>,
+    self_program_str: &str,                // 当前程序ID
+    meta: Option<UiTransactionStatusMeta>, // 交易元数据
 ) -> Result<(), ClientError> {
     let logs: Vec<String> = if let Some(meta_data) = meta {
         let log_messages = if let OptionSerializer::Some(log_messages) = meta_data.log_messages {
@@ -63,6 +64,9 @@ pub fn parse_program_event(
     Ok(())
 }
 
+// Execution结构体
+// 维护程序调用层级关系
+// 提供push/pop方法管理调用栈
 struct Execution {
     stack: Vec<String>,
 }
@@ -105,6 +109,11 @@ impl Execution {
     }
 }
 
+// 解析交易中的指令数据
+// 解码交易原始消息
+// 合并地址查找表数据
+// 定位当前程序的指令位置
+// 解析主指令和内部指令
 pub fn handle_program_log(
     self_program_str: &str,
     l: &str,
@@ -305,6 +314,14 @@ pub fn handle_program_instruction(
         disc
     };
     // println!("{:?}", disc);
+
+    // CreateAmmConfig	创建AMM配置	费率参数
+    // UpdateAmmConfig	更新AMM配置	参数索引/值
+    // Initialize	初始化资金池	初始流动性量
+    // Deposit	存入流动性	LP代币数量
+    // Withdraw	提取流动性	最小提取量
+    // SwapBaseInput	指定输入交换	输入量/最小输出
+    // SwapBaseOutput	指定输出交换	最大输入/输出量
 
     match disc {
         instruction::CreateAmmConfig::DISCRIMINATOR => {

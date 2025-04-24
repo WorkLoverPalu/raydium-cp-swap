@@ -18,14 +18,14 @@ use std::ops::Deref;
 
 #[derive(Accounts)]
 pub struct Initialize<'info> {
-    /// Address paying to create the pool. Can be anyone
+    /// 地址支付创建池的费用。可以是任何人
     #[account(mut)]
     pub creator: Signer<'info>,
 
-    /// Which config the pool belongs to.
+    /// 池属于哪个配置。
     pub amm_config: Box<Account<'info, AmmConfig>>,
 
-    /// CHECK: pool vault and lp mint authority
+    /// 检查：金库和 lp 铸币机构
     #[account(
         seeds = [
             crate::AUTH_SEED.as_bytes(),
@@ -34,33 +34,33 @@ pub struct Initialize<'info> {
     )]
     pub authority: UncheckedAccount<'info>,
 
-    /// CHECK: Initialize an account to store the pool state
-    /// PDA account:
-    /// seeds = [
+    /// 检查：初始化一个帐户来存储池状态
+    /// 掌上电脑帐户：
+    /// 种子=[
     ///     POOL_SEED.as_bytes(),
     ///     amm_config.key().as_ref(),
     ///     token_0_mint.key().as_ref(),
     ///     token_1_mint.key().as_ref(),
     /// ],
     ///
-    /// Or random account: must be signed by cli
+    /// 或者随机账户：必须由cli签名
     #[account(mut)]
     pub pool_state: UncheckedAccount<'info>,
 
-    /// Token_0 mint, the key must smaller then token_1 mint.
+    /// Token_0 铸币，密钥必须小于 token_1 铸币。
     #[account(
         constraint = token_0_mint.key() < token_1_mint.key(),
         mint::token_program = token_0_program,
     )]
     pub token_0_mint: Box<InterfaceAccount<'info, Mint>>,
 
-    /// Token_1 mint, the key must grater then token_0 mint.
+    /// 代币 1 铸造，密钥必须大于代币 0 铸造。
     #[account(
         mint::token_program = token_1_program,
     )]
     pub token_1_mint: Box<InterfaceAccount<'info, Mint>>,
 
-    /// pool lp mint
+    /// 池 LP 薄荷
     #[account(
         init,
         seeds = [
@@ -75,7 +75,7 @@ pub struct Initialize<'info> {
     )]
     pub lp_mint: Box<InterfaceAccount<'info, Mint>>,
 
-    /// payer token0 account
+    /// 付款人token0账户
     #[account(
         mut,
         token::mint = token_0_mint,
@@ -83,7 +83,7 @@ pub struct Initialize<'info> {
     )]
     pub creator_token_0: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// creator token1 account
+    /// 创建者令牌1帐户
     #[account(
         mut,
         token::mint = token_1_mint,
@@ -91,7 +91,7 @@ pub struct Initialize<'info> {
     )]
     pub creator_token_1: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// creator lp token account
+    /// LP代币创建者账户
     #[account(
         init,
         associated_token::mint = lp_mint,
@@ -101,7 +101,7 @@ pub struct Initialize<'info> {
     )]
     pub creator_lp_token: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// CHECK: Token_0 vault for the pool
+    /// 检查：池的 Token_0 保管库
     #[account(
         mut,
         seeds = [
@@ -113,7 +113,7 @@ pub struct Initialize<'info> {
     )]
     pub token_0_vault: UncheckedAccount<'info>,
 
-    /// CHECK: Token_1 vault for the pool
+    /// 检查：池的 Token_1 保管库
     #[account(
         mut,
         seeds = [
@@ -125,14 +125,14 @@ pub struct Initialize<'info> {
     )]
     pub token_1_vault: UncheckedAccount<'info>,
 
-    /// create pool fee account
+    /// 创建池费用账户
     #[account(
         mut,
         address= crate::create_pool_fee_reveiver::id(),
     )]
     pub create_pool_fee: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// an account to store oracle observations
+    /// 存储预言机观察结果的帐户
     #[account(
         init,
         seeds = [
@@ -145,17 +145,17 @@ pub struct Initialize<'info> {
     )]
     pub observation_state: AccountLoader<'info, ObservationState>,
 
-    /// Program to create mint account and mint tokens
+    /// 创建铸币账户和铸币代币的程序
     pub token_program: Program<'info, Token>,
-    /// Spl token program or token program 2022
+    /// Spl 代币计划或代币计划 2022
     pub token_0_program: Interface<'info, TokenInterface>,
-    /// Spl token program or token program 2022
+    /// Spl 代币计划或代币计划 2022
     pub token_1_program: Interface<'info, TokenInterface>,
-    /// Program to create an ATA for receiving position NFT
+    /// 创建用于接收头寸 NFT 的 ATA 的程序
     pub associated_token_program: Program<'info, AssociatedToken>,
-    /// To create a new program account
+    /// 创建新的计划帐户
     pub system_program: Program<'info, System>,
-    /// Sysvar for program account
+    /// 程序帐户的 Sysvar
     pub rent: Sysvar<'info, Rent>,
 }
 
@@ -178,7 +178,7 @@ pub fn initialize(
     if open_time <= block_timestamp {
         open_time = block_timestamp + 1;
     }
-    // due to stack/heap limitations, we have to create redundant new accounts ourselves.
+    // 由于堆栈/堆的限制，我们必须自己创建冗余的新帐户。
     create_token_account(
         &ctx.accounts.authority.to_account_info(),
         &ctx.accounts.creator.to_account_info(),

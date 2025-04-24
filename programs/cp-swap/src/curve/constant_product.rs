@@ -5,17 +5,17 @@ use crate::{
     utils::CheckedCeilDiv,
 };
 
-/// ConstantProductCurve struct implementing CurveCalculator
+/// ConstantProductCurve 结构实现 CurveCalculator
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct ConstantProductCurve;
 
 impl ConstantProductCurve {
-    /// Constant product swap ensures x * y = constant
-    /// The constant product swap calculation, factored out of its class for reuse.
+    /// 恒定的乘积交换确保 x *y = 恒定
+    /// 恒定的产品交换计算，从其类中提取以供重用。
     ///
-    /// This is guaranteed to work for all values such that:
-    ///  - 1 <= swap_source_amount * swap_destination_amount <= u128::MAX
-    ///  - 1 <= source_amount <= u64::MAX
+    /// 这保证适用于所有值，例如：
+    ///  -1 <= swap_source_amount *swap_destination_amount <= u128::MAX
+    ///  -1 <= source_amount <= u64::MAX
     pub fn swap_base_input_without_fees(
         source_amount: u128,
         swap_source_amount: u128,
@@ -44,11 +44,11 @@ impl ConstantProductCurve {
         source_amount_swapped
     }
 
-    /// Get the amount of trading tokens for the given amount of pool tokens,
-    /// provided the total trading tokens and supply of pool tokens.
+    /// 获取给定数量的池代币的交易代币数量，
+    /// 提供总交易代币和矿池代币供应量。
     ///
-    /// The constant product implementation is a simple ratio calculation for how
-    /// many trading tokens correspond to a certain number of pool tokens
+    /// 恒定乘积实现是一个简单的比率计算，用于计算如何
+    /// 许多交易代币对应一定数量的池代币
     pub fn lp_tokens_to_trading_tokens(
         lp_token_amount: u128,
         lp_token_supply: u128,
@@ -68,11 +68,11 @@ impl ConstantProductCurve {
                 let token_0_remainder = lp_token_amount
                     .checked_mul(swap_token_0_amount)?
                     .checked_rem(lp_token_supply)?;
-                // Also check for 0 token A and B amount to avoid taking too much
-                // for tiny amounts of pool tokens.  For example, if someone asks
-                // for 1 pool token, which is worth 0.01 token A, we avoid the
-                // ceiling of taking 1 token A and instead return 0, for it to be
-                // rejected later in processing.
+                // 同时检查代币 A 和 B 的数量是否为 0，以避免拿走太多
+                // 对于少量的池代币。  例如，如果有人问
+                // 对于 1 个池代币，其价值 0.01 代币 A，我们避免
+                // 获取 1 个代币 A 并返回 0 的上限，因为它是
+                // 稍后在处理中被拒绝。
                 if token_0_remainder > 0 && token_0_amount > 0 {
                     token_0_amount += 1;
                 }
@@ -246,8 +246,8 @@ mod tests {
             let pool_token_supply = pool_token_supply as u128;
             let swap_token_a_amount = swap_token_a_amount as u128;
             let swap_token_b_amount = swap_token_b_amount as u128;
-            // Make sure we will get at least one trading token out for each
-            // side, otherwise the calculation fails
+            // 确保我们将为每个人至少获得一个交易代币
+            // 侧，否则计算失败
             prop_assume!(pool_token_amount * swap_token_a_amount / pool_token_supply >= 1);
             prop_assume!(pool_token_amount * swap_token_b_amount / pool_token_supply >= 1);
             check_pool_value_from_deposit(
@@ -270,8 +270,8 @@ mod tests {
             let pool_token_supply = pool_token_supply as u128;
             let swap_token_a_amount = swap_token_a_amount as u128;
             let swap_token_b_amount = swap_token_b_amount as u128;
-            // Make sure we will get at least one trading token out for each
-            // side, otherwise the calculation fails
+            // 确保我们将为每个人至少获得一个交易代币
+            // 侧，否则计算失败
             prop_assume!(pool_token_amount * swap_token_a_amount / pool_token_supply >= 1);
             prop_assume!(pool_token_amount * swap_token_b_amount / pool_token_supply >= 1);
             check_pool_value_from_withdraw(

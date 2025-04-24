@@ -9,10 +9,10 @@ use anchor_spl::token_interface::{Mint, Token2022, TokenAccount};
 
 #[derive(Accounts)]
 pub struct Deposit<'info> {
-    /// Pays to mint the position
+    /// 付费铸造职位
     pub owner: Signer<'info>,
 
-    /// CHECK: pool vault and lp mint authority
+    /// 检查：金库和 lp 铸币机构
     #[account(
         seeds = [
             crate::AUTH_SEED.as_bytes(),
@@ -24,11 +24,11 @@ pub struct Deposit<'info> {
     #[account(mut)]
     pub pool_state: AccountLoader<'info, PoolState>,
 
-    /// Owner lp tokan account
+    /// 所有者 lp tokan 帐户
     #[account(mut,  token::authority = owner)]
     pub owner_lp_token: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// The payer's token account for token_0
+    /// token_0 的付款人代币账户
     #[account(
         mut,
         token::mint = token_0_vault.mint,
@@ -36,7 +36,7 @@ pub struct Deposit<'info> {
     )]
     pub token_0_account: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// The payer's token account for token_1
+    /// token_1 的付款人代币账户
     #[account(
         mut,
         token::mint = token_1_vault.mint,
@@ -44,39 +44,39 @@ pub struct Deposit<'info> {
     )]
     pub token_1_account: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// The address that holds pool tokens for token_0
+    /// 持有 token_0 池代币的地址
     #[account(
         mut,
         constraint = token_0_vault.key() == pool_state.load()?.token_0_vault
     )]
     pub token_0_vault: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// The address that holds pool tokens for token_1
+    /// 保存 token_1 池代币的地址
     #[account(
         mut,
         constraint = token_1_vault.key() == pool_state.load()?.token_1_vault
     )]
     pub token_1_vault: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// token Program
+    /// 代币计划
     pub token_program: Program<'info, Token>,
 
-    /// Token program 2022
+    /// 代币计划 2022
     pub token_program_2022: Program<'info, Token2022>,
 
-    /// The mint of token_0 vault
+    /// token_0金库的铸币厂
     #[account(
         address = token_0_vault.mint
     )]
     pub vault_0_mint: Box<InterfaceAccount<'info, Mint>>,
 
-    /// The mint of token_1 vault
+    /// token_1金库的铸币厂
     #[account(
         address = token_1_vault.mint
     )]
     pub vault_1_mint: Box<InterfaceAccount<'info, Mint>>,
 
-    /// Lp token mint
+    /// Lp代币铸造
     #[account(
         mut,
         address = pool_state.load()?.lp_mint @ ErrorCode::IncorrectLpMint)

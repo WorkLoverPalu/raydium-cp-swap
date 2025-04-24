@@ -17,14 +17,15 @@ use spl_token_2022::{
 use spl_token_client::token::ExtensionInitializationParams;
 use std::{rc::Rc, str::FromStr};
 
+// 创建并初始化代币铸造账户
 pub fn create_and_init_mint_instr(
     config: &ClientConfig,
-    token_program: Pubkey,
-    mint_key: &Pubkey,
-    mint_authority: &Pubkey,
-    freeze_authority: Option<&Pubkey>,
-    extension_init_params: Vec<ExtensionInitializationParams>,
-    decimals: u8,
+    token_program: Pubkey,             // spl_token 或 spl_token_2022 程序ID
+    mint_key: &Pubkey,                 // 新铸造账户地址
+    mint_authority: &Pubkey,           // 铸造权限地址
+    freeze_authority: Option<&Pubkey>, // 冻结权限地址(可选)
+    extension_init_params: Vec<ExtensionInitializationParams>, // 扩展参数(Token-2022)
+    decimals: u8,                      // 代币精度
 ) -> Result<Vec<Instruction>> {
     let payer = read_keypair_file(&config.payer_path)?;
     let url = Cluster::Custom(config.http_url.clone(), config.ws_url.clone());
@@ -63,6 +64,7 @@ pub fn create_and_init_mint_instr(
     Ok(instructions)
 }
 
+// 账户创建
 pub fn create_account_rent_exmpt_instr(
     config: &ClientConfig,
     new_account_key: &Pubkey,
@@ -89,6 +91,7 @@ pub fn create_account_rent_exmpt_instr(
     Ok(instructions)
 }
 
+// 创建关联 Token 账户(ATA)
 pub fn create_ata_token_account_instr(
     config: &ClientConfig,
     token_program: Pubkey,
@@ -114,11 +117,12 @@ pub fn create_ata_token_account_instr(
     Ok(instructions)
 }
 
+// 创建并初始化辅助 Token 账户
 pub fn create_and_init_auxiliary_token(
     config: &ClientConfig,
-    new_account_key: &Pubkey,
-    mint: &Pubkey,
-    owner: &Pubkey,
+    new_account_key: &Pubkey, // 新 Token 账户地址
+    mint: &Pubkey,            // 代币铸造地址
+    owner: &Pubkey,           // Token 账户所有者
 ) -> Result<Vec<Instruction>> {
     let payer = read_keypair_file(&config.payer_path)?;
     let url = Cluster::Custom(config.http_url.clone(), config.ws_url.clone());
@@ -172,11 +176,12 @@ pub fn create_and_init_auxiliary_token(
     Ok(instructions)
 }
 
+// 关闭 Token 账户并回收租金
 pub fn close_token_account(
     config: &ClientConfig,
-    close_account: &Pubkey,
-    destination: &Pubkey,
-    owner: &Keypair,
+    close_account: &Pubkey, // 要关闭的账户
+    destination: &Pubkey, // 接收剩余SOL的账户
+    owner: &Keypair, // 账户所有者密钥
 ) -> Result<Vec<Instruction>> {
     let payer = read_keypair_file(&config.payer_path)?;
     let url = Cluster::Custom(config.http_url.clone(), config.ws_url.clone());
@@ -197,6 +202,7 @@ pub fn close_token_account(
     Ok(instructions)
 }
 
+// Token 转账与铸造
 pub fn spl_token_transfer_instr(
     config: &ClientConfig,
     from: &Pubkey,
@@ -223,7 +229,7 @@ pub fn spl_token_transfer_instr(
         .instructions()?;
     Ok(instructions)
 }
-
+// 铸造代币到指定账户
 pub fn spl_token_mint_to_instr(
     config: &ClientConfig,
     token_program: Pubkey,
@@ -256,6 +262,7 @@ pub fn spl_token_mint_to_instr(
     Ok(instructions)
 }
 
+// 将 SOL 包装为 wSOL
 pub fn wrap_sol_instr(config: &ClientConfig, amount: u64) -> Result<Vec<Instruction>> {
     let payer = read_keypair_file(&config.payer_path)?;
     let wallet_key = payer.pubkey();

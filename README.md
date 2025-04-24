@@ -1,31 +1,29 @@
-# raydium-cp-swap
+# raydium-cp-swap（恒定乘积交易协议）
 
-A revamped constant product AMM program optimized for straightforward pool deployment along with additional features and integrations:
-- No Openbook market ID is required for pool creation
-- Token22 is supported
-- Built-in price oracle
-- Optimized in Anchor
+这是一个经过重构的恒定乘积自动化做市商（AMM）程序，专为简化资金池部署而优化，并提供以下增强功能和集成支持：
+- 创建资金池无需提供Openbook市场ID
+- 支持Token22代币标准
+- 内置价格预言机
+- 基于Anchor框架进行优化
 
-The program has been audited by [MadShield](https://www.madshield.xyz/). The report can be found [here](https://github.com/raydium-io/raydium-docs/tree/master/audit/MadShield%20Q1%202024).
+本程序已通过[MadShield](https://www.madshield.xyz/)安全审计，审计报告详见[此处](https://github.com/raydium-io/raydium-docs/tree/master/audit/MadShield%20Q1%202024)。
 
-The program assets are in-scope for Raydium’s [Immunefi bug bounty program](https://immunefi.com/bug-bounty/raydium/).
+该项目资产适用于Raydium在[Immunefi](https://immunefi.com/bug-bounty/raydium/)平台推出的漏洞赏金计划。
 
-## Environment Setup
+## 环境配置
 
-1. Install Rust.
-2. Install Solana and then run solana-keygen new to create a keypair at the default location.
-3. Install Anchor.
+1. 安装Rust语言环境
+2. 安装Solana工具链后，执行`solana-keygen new`命令在默认路径创建密钥对
+3. 安装Anchor开发框架
 
-## Quickstart
+## 快速开始
 
-Clone the repository and test the program.
-
+克隆代码库并测试程序：
 ```shell
-
 git clone https://github.com/raydium-io/raydium-cp-swap
 cd raydium-cp-swap && anchor test
 ```
 
-## License
+## 许可证
 
-Raydium constant product swap is licensed under the Apache License, Version 2.0.
+Raydium恒定乘积交易协议采用Apache许可证2.0版本授权。

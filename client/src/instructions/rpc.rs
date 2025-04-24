@@ -11,11 +11,12 @@ use solana_sdk::{
 };
 use std::convert::Into;
 
+// 交易模拟执行
 pub fn simulate_transaction(
-    client: &RpcClient,
-    transaction: &Transaction,
-    sig_verify: bool,
-    cfg: CommitmentConfig,
+    client: &RpcClient,        // RPC客户端实例
+    transaction: &Transaction, // 待模拟交易
+    sig_verify: bool,          // 是否验证签名
+    cfg: CommitmentConfig,     // 确认级别配置
 ) -> RpcResult<RpcSimulateTransactionResult> {
     let serialized_encoded = bs58::encode(bincode::serialize(transaction).unwrap()).into_string();
     client.send(
@@ -26,7 +27,12 @@ pub fn simulate_transaction(
     )
 }
 
-pub fn send_txn(client: &RpcClient, txn: &Transaction, wait_confirm: bool) -> Result<Signature> {
+// 交易发送
+pub fn send_txn(
+    client: &RpcClient, // RPC客户端实例
+    txn: &Transaction,  // 待发送交易
+    wait_confirm: bool, // 是否等待确认
+) -> Result<Signature> {
     Ok(client.send_and_confirm_transaction_with_spinner_and_config(
         txn,
         if wait_confirm {
@@ -41,7 +47,11 @@ pub fn send_txn(client: &RpcClient, txn: &Transaction, wait_confirm: bool) -> Re
     )?)
 }
 
-pub fn get_token_account<T: TokenPack>(client: &RpcClient, addr: &Pubkey) -> Result<T> {
+// 账户数据查询
+pub fn get_token_account<T: TokenPack>(
+    client: &RpcClient, // RPC客户端实例
+    addr: &Pubkey,      // 账户地址
+) -> Result<T> {
     let account = client
         .get_account_with_commitment(addr, CommitmentConfig::processed())?
         .value
@@ -49,9 +59,10 @@ pub fn get_token_account<T: TokenPack>(client: &RpcClient, addr: &Pubkey) -> Res
     T::unpack_from_slice(&account.data).map_err(Into::into)
 }
 
+// 批量查询账户原始数据
 pub fn get_multiple_accounts(
-    client: &RpcClient,
-    pubkeys: &[Pubkey],
+    client: &RpcClient, // RPC客户端实例
+    pubkeys: &[Pubkey], // 账户地址列表
 ) -> Result<Vec<Option<Account>>> {
     Ok(client.get_multiple_accounts(pubkeys)?)
 }

@@ -2,11 +2,11 @@ use anchor_lang::prelude::*;
 
 pub const AMM_CONFIG_SEED: &str = "amm_config";
 
-/// Holds the current owner of the factory
+/// 持有工厂现任所有者
 #[account]
 #[derive(Default, Debug)]
 pub struct AmmConfig {
-    /// Bump to identify PDA
+    /// 碰撞识别 PDA
     pub bump: u8,
     /// Status to control if new pool can be create
     pub disable_create_pool: bool,

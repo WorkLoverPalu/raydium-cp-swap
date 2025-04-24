@@ -1,82 +1,83 @@
-# Raydium CP-Swap (CPMM) Bug Bounty Program
+# Raydium CP-Swap (CPMM) 漏洞赏金计划
 
-Raydium's full bug bounty program with ImmuneFi can be found at: https://immunefi.com/bounty/raydium/
+Raydium在Immunefi平台的完整漏洞赏金计划详见：https://immunefi.com/bounty/raydium/
 
-## Rewards by Threat Level
+## 威胁等级对应奖励
 
-Rewards are distributed according to the impact of the vulnerability based on the Immunefi Vulnerability Severity Classification System V2.3. This is a simplified 5-level scale, focusing on the impact of the vulnerability reported.
+根据Immunefi漏洞严重程度分类系统V2.3，赏金将按漏洞影响程度分配。该评估采用简化的五级标准，重点关注所报告漏洞的实际影响。
 
-### Smart Contracts
+### 智能合约漏洞
 
-| Severity | Bounty                    |
+| 严重程度 | 赏金金额                  |
 | -------- | ------------------------- |
-| Critical | USD 50,000 to USD 505,000 |
-| High     | USD 40,000                |
-| Medium   | USD 5,000                 |
+| 严重     | 50,000 至 505,000 美元    |
+| 高危     | 40,000 美元               |
+| 中危     | 5,000 美元                |
 
-All bug reports must include a Proof of Concept (PoC) demonstrating how the vulnerability can be exploited to impact an asset-in-scope to be eligible for a reward. Critical and High severity bug reports should also include a suggestion for a fix. Explanations and statements are not accepted as PoC and code is required.
+所有漏洞报告必须包含概念验证(PoC)，证明该漏洞如何影响范围内的资产才能获得奖励。严重和高危漏洞报告还应包含修复建议。纯文字说明不被视为有效PoC，必须提供可验证代码。
 
-Rewards for critical smart contract bug reports will be further capped at 10% of direct funds at risk if the bug discovered is exploited. However, there is a minimum reward of USD 50,000.
+若发现的智能合约严重漏洞被利用，其赏金上限为受威胁直接资金的10%，但最低保证50,000美元奖励。
 
-Bugs in `raydium-sdk` and other code outside of the smart contract will be assessed on a case-by-case basis.
+`raydium-sdk`及其他非智能合约代码的漏洞将根据具体情况评估。
 
-## Report Submission
+## 报告提交方式
 
-Please email security@reactorlabs.io with a detailed description of the attack vector. For high- and critical-severity reports, please include a proof of concept. We will reach back out within 24 hours with additional questions or next steps on the bug bounty.
+请发送邮件至security@reactorlabs.io，详细描述攻击向量。高危和严重级别的报告需包含概念验证。我们将在24小时内回复后续处理流程。
 
-## Payout Information
+## 奖励支付
 
-Payouts are handled by the Raydium team directly and are denominated in USD. Payouts can be done in RAY, SOL, or USDC.
+奖励由Raydium团队直接处理，以美元计价，可通过RAY、SOL或USDC支付。
 
-## Out of Scope & Rules
+## 排除范围及规则
 
-The following vulnerabilities are excluded from the rewards for this bug bounty program:
+以下漏洞类型不在本赏金计划范围内：
+- 报告者已实施并造成实际损害的漏洞利用
+- 需要获取泄露密钥/凭证的攻击
+- 需要特权地址(治理/策略)权限的攻击
+- 第三方预言机数据错误（不包括预言机操纵/闪电贷攻击）
+- 基础经济治理攻击（如51%攻击）
+- 流动性不足问题
+- 最佳实践建议
+- 女巫攻击
+- 中心化风险
+- 任何前端界面问题
+- Solana核心运行时的漏洞（请提交至[Solana漏洞赏金计划](https://github.com/solana-labs/solana/security/policy)）
+- 需要验证节点执行的漏洞
+- 需要特权密钥的攻击
+- 团队已知的MEV攻击向量
 
-- Attacks that the reporter has already exploited themselves, leading to damage
-- Attacks requiring access to leaked keys/credentials
-- Attacks requiring access to privileged addresses (governance, strategist)
-- Incorrect data supplied by third party oracles (not excluding oracle manipulation/flash loan attacks)
-- Basic economic governance attacks (e.g. 51% attack)
-- Lack of liquidity
-- Best practice critiques
-- Sybil attacks
-- Centralization risks
-- Any UI bugs
-- Bugs in the core Solana runtime (please submit these to [Solana's bug bounty program](https://github.com/solana-labs/solana/security/policy))
-- Vulnerabilities that require a validator to execute them
-- Vulnerabilities requiring access to privileged keys/credentials
-- MEV vectors the team is already aware of
+## 在范围内的AMM资产
 
-## AMM Assets in Scope
+| 目标文件                                                                                                                 | 类型                                  |
+| ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------- |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/lib.rs                                     | 智能合约 - 主库文件                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/error.rs                                   | 智能合约 - 错误处理                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/admin/collect_fund_fee.rs     | 智能合约 - 资金费收取                 |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/admin/collect_protocol_fee.rs | 智能合约 - 协议费收取                 |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/admin/create_config.rs        | 智能合约 - 配置创建                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/admin/mod.rs                  | 智能合约 - 管理模块                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/admin/update_config.rs        | 智能合约 - 配置更新                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/admin/update_pool_status.rs   | 智能合约 - 资金池状态更新             |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/deposit.rs                    | 智能合约 - 存款功能                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/initialize.rs                 | 智能合约 - 初始化功能                 |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/mod.rs                        | 智能合约 - 指令模块                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/swap_base_input.rs            | 智能合约 - 基础输入交换               |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/swap_base_output.rs           | 智能合约 - 基础输出交换               |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/withdraw.rs                   | 智能合约 - 取款功能                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/states/config.rs                           | 智能合约 - 配置状态                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/states/events.rs                           | 智能合约 - 事件状态                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/states/mod.rs                              | 智能合约 - 状态模块                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/states/pool.rs                             | 智能合约 - 资金池状态                 |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/math.rs                              | 智能合约 - 数学工具                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/mod.rs                               | 智能合约 - 工具模块                   |
+| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs                             | 智能合约 - 代币工具                   |
 
-| Target                                                                                                                    | Type                                  |
-| ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/lib.rs                                     | Smart Contract - lib                  |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/error.rs                                   | Smart Contract - error                |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/admin/collect_fund_fee.rs     | Smart Contract - collect_fund_fee     |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/admin/collect_protocol_fee.rs | Smart Contract - collect_protocol_fee |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/admin/create_config.rs        | Smart Contract - create_config        |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/admin/mod.rs                  | Smart Contract - admin mod            |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/admin/update_config.rs        | Smart Contract - update_config        |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/admin/update_pool_status.rs   | Smart Contract - update_pool_status   |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/deposit.rs                    | Smart Contract - deposit              |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/initialize.rs                 | Smart Contract - initialize           |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/mod.rs                        | Smart Contract - instructions mod     |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/swap_base_input.rs            | Smart Contract - swap_base_input      |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/swap_base_output.rs           | Smart Contract - swap_base_output     |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/instructions/withdraw.rs                   | Smart Contract - withdraw             |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/states/config.rs                           | Smart Contract - config               |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/states/events.rs                           | Smart Contract - events               |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/states/mod.rs                              | Smart Contract - states mod           |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/states/pool.rs                             | Smart Contract - pool                 |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/math.rs                              | Smart Contract - math                 |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/mod.rs                               | Smart Contract - utils mod            |
-| https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs                             | Smart Contract - utils token          |
+## 补充信息
 
-## Additional Information
+Raydium CPMM公开测试网地址：
+https://explorer.solana.com/address/CPMDWBwJDtYax9qW7AyRuVC19Cc4L4Vcy4n2BHAbHkCW?cluster=devnet
 
-A public testnet of Raydium's CPMM can be found at A public testnet of Raydium’s AMM can be found at https://explorer.solana.com/address/CPMDWBwJDtYax9qW7AyRuVC19Cc4L4Vcy4n2BHAbHkCW?cluster=devnet
+OpenBook中央限价订单簿测试网地址：
+https://explorer.solana.com/address/EoTcMgcDRTJVZDMZWBoU6rhYHZfkNTVEAfz3uUJRcYGj
 
-A public testnet of OpenBook's Central Limit Order Book can be found at https://explorer.solana.com/address/EoTcMgcDRTJVZDMZWBoU6rhYHZfkNTVEAfz3uUJRcYGj
-
-If a Critical Impact can be caused to any other asset managed by Raydium that isn't on this table but for which the impact is in the Impacts in Scope section below, you are encouraged to submit it for consideration by the project. This only applies to Critical impacts.
+若发现任何未列在上述表格中但符合下文"影响范围"的Raydium管理资产存在严重漏洞，欢迎提交报告。此条款仅适用于严重级别漏洞。
