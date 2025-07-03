@@ -8,7 +8,7 @@ use anchor_spl::token_interface::Token2022;
 use anchor_spl::token_interface::TokenAccount;
 #[derive(Accounts)]
 pub struct CollectFundFee<'info> {
-    /// 现在只有管理员或基金所有者可以收取费用
+    /// Only admin or fund_owner can collect fee now
     #[account(constraint = (owner.key() == amm_config.fund_owner || owner.key() == crate::admin::id()) @ ErrorCode::InvalidOwner)]
     pub owner: Signer<'info>,
 

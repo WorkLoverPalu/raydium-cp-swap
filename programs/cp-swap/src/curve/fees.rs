@@ -32,7 +32,7 @@ impl Fees {
         )
     }
 
-    /// 计算交易代币中的所有者交易费用
+    /// Calculate the owner protocol fee in trading tokens
     pub fn protocol_fee(amount: u128, protocol_fee_rate: u64) -> Option<u128> {
         floor_div(
             amount,

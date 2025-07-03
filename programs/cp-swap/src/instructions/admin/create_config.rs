@@ -9,7 +9,7 @@ pub struct CreateAmmConfig<'info> {
     /// 要设置为协议所有者的地址。
     #[account(
         mut,
-        address = crate::admin::id() @ ErrorCode::InvalidOwner
+        address = crate::admin::ID @ ErrorCode::InvalidOwner
     )]
     pub owner: Signer<'info>,
 

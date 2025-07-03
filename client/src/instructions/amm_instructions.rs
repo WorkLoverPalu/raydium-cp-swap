@@ -9,7 +9,10 @@
 
 // anchor_client 用于与Anchor程序交互的客户端库
 use anchor_client::{Client, Cluster};
-// 错误处理工具
+use anchor_spl::{
+    associated_token::spl_associated_token_account, memo::spl_memo, token::spl_token,
+    token_2022::spl_token_2022,
+};
 use anyhow::Result;
 // 基础SDK，包含指令、公钥等核心类型
 use solana_sdk::{instruction::Instruction, pubkey::Pubkey, system_program, sysvar};
@@ -29,17 +32,18 @@ use super::super::{read_keypair_file, ClientConfig};
 
 // 初始化资金池
 pub fn initialize_pool_instr(
-    config: &ClientConfig,        //客户配置
-    token_0_mint: Pubkey,         // 代币0的mint地址
-    token_1_mint: Pubkey,         // 代币1的mint地址
-    token_0_program: Pubkey,      // 代币0的程序地址
-    token_1_program: Pubkey,      // 代币1的程序地址
-    user_token_0_account: Pubkey, // 用户的代币0账户地址
-    user_token_1_account: Pubkey, // 用户的代币1账户地址
-    create_pool_fee: Pubkey,      // 创建池的费用地址
-    init_amount_0: u64,           // 初始化代币0的数量
-    init_amount_1: u64,           // 初始化代币1的数量
-    open_time: u64,               // 开放时间
+    config: &ClientConfig,
+    token_0_mint: Pubkey,
+    token_1_mint: Pubkey,
+    token_0_program: Pubkey,
+    token_1_program: Pubkey,
+    user_token_0_account: Pubkey,
+    user_token_1_account: Pubkey,
+    create_pool_fee: Pubkey,
+    random_pool_id: Option<Pubkey>,
+    init_amount_0: u64,
+    init_amount_1: u64,
+    open_time: u64,
 ) -> Result<Vec<Instruction>> {
     // 读取支付者的密钥对
     let payer = read_keypair_file(&config.payer_path)?;
@@ -65,17 +69,21 @@ pub fn initialize_pool_instr(
         &program.id(),
     );
 
-    // 计算其他相关的PDA（程序派生）地址：Pool 地址
-    let (pool_account_key, __bump) = Pubkey::find_program_address(
-        &[
-            POOL_SEED.as_bytes(),
-            amm_config_key.to_bytes().as_ref(),
-            token_0_mint.to_bytes().as_ref(),
-            token_1_mint.to_bytes().as_ref(),
-        ],
-        &program.id(),
-    );
-    // 计算其他相关的PDA（程序派生）地址：配置账户地址
+    let pool_account_key = if random_pool_id.is_some() {
+        random_pool_id.unwrap()
+    } else {
+        Pubkey::find_program_address(
+            &[
+                POOL_SEED.as_bytes(),
+                amm_config_key.to_bytes().as_ref(),
+                token_0_mint.to_bytes().as_ref(),
+                token_1_mint.to_bytes().as_ref(),
+            ],
+            &program.id(),
+        )
+        .0
+    };
+
     let (authority, __bump) = Pubkey::find_program_address(&[AUTH_SEED.as_bytes()], &program.id());
 
     // 代币0地址
@@ -117,13 +125,7 @@ pub fn initialize_pool_instr(
         &program.id(),
     );
 
-    // 创建指令
-    // 这里使用了request函数来创建一个请求
-    // 该请求包含了多个账户的地址和相关参数
-    // 这些账户包括创建者、池状态、代币0和代币1的mint地址、LP mint地址等
-    // 还包括代币0和代币1的vault地址、创建池的费用地址等
-    // 还包括观察状态地址、代币程序地址、系统程序地址等
-    let instructions = program
+    let mut instructions = program
         .request()
         .accounts(raydium_cp_accounts::Initialize {
             creator: program.payer(),   // 创建者，支付交易费用的账户
@@ -156,6 +158,15 @@ pub fn initialize_pool_instr(
             open_time,
         })
         .instructions()?;
+    if random_pool_id.is_some() {
+        // update account signer as true for random pool
+        for account in instructions[0].accounts.iter_mut() {
+            if account.pubkey == random_pool_id.unwrap() {
+                account.is_signer = true;
+                break;
+            }
+        }
+    }
     Ok(instructions)
 }
 

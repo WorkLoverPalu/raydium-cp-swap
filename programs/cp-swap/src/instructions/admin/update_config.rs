@@ -5,8 +5,8 @@ use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
 pub struct UpdateAmmConfig<'info> {
-    /// amm 配置所有者或管理员
-    #[account(address = crate::admin::id() @ ErrorCode::InvalidOwner)]
+    /// The amm config owner or admin
+    #[account(address = crate::admin::ID @ ErrorCode::InvalidOwner)]
     pub owner: Signer<'info>,
 
     /// 要更改的 Amm 配置帐户

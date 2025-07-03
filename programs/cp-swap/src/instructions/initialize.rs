@@ -10,10 +10,11 @@ use anchor_lang::{
 };
 use anchor_spl::{
     associated_token::AssociatedToken,
+    token::spl_token,
     token::Token,
-    token_2022::spl_token_2022,
     token_interface::{Mint, TokenAccount, TokenInterface},
 };
+use spl_token_2022;
 use std::ops::Deref;
 
 #[derive(Accounts)]
@@ -48,11 +49,7 @@ pub struct Initialize<'info> {
     pub pool_state: UncheckedAccount<'info>,
 
     /// Token_0 铸币，密钥必须小于 token_1 铸币。
-    #[account(
         constraint = token_0_mint.key() < token_1_mint.key(),
-        mint::token_program = token_0_program,
-    )]
-    pub token_0_mint: Box<InterfaceAccount<'info, Mint>>,
 
     /// 代币 1 铸造，密钥必须大于代币 0 铸造。
     #[account(
@@ -101,11 +98,8 @@ pub struct Initialize<'info> {
     )]
     pub creator_lp_token: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    /// 检查：池的 Token_0 保管库
+ /// 检查：池的 Token_0 保管库
     #[account(
-        mut,
-        seeds = [
-            POOL_VAULT_SEED.as_bytes(),
             pool_state.key().as_ref(),
             token_0_mint.key().as_ref()
         ],
@@ -113,7 +107,7 @@ pub struct Initialize<'info> {
     )]
     pub token_0_vault: UncheckedAccount<'info>,
 
-    /// 检查：池的 Token_1 保管库
+/// 检查：池的 Token_1 保管库
     #[account(
         mut,
         seeds = [
@@ -128,7 +122,7 @@ pub struct Initialize<'info> {
     /// 创建池费用账户
     #[account(
         mut,
-        address= crate::create_pool_fee_reveiver::id(),
+        address= crate::create_pool_fee_reveiver::ID,
     )]
     pub create_pool_fee: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -186,12 +180,12 @@ pub fn initialize(
         &ctx.accounts.token_0_mint.to_account_info(),
         &ctx.accounts.system_program.to_account_info(),
         &ctx.accounts.token_0_program.to_account_info(),
-        &[&[
+        &[
             POOL_VAULT_SEED.as_bytes(),
             ctx.accounts.pool_state.key().as_ref(),
             ctx.accounts.token_0_mint.key().as_ref(),
             &[ctx.bumps.token_0_vault][..],
-        ][..]],
+        ],
     )?;
 
     create_token_account(
@@ -201,12 +195,12 @@ pub fn initialize(
         &ctx.accounts.token_1_mint.to_account_info(),
         &ctx.accounts.system_program.to_account_info(),
         &ctx.accounts.token_1_program.to_account_info(),
-        &[&[
+        &[
             POOL_VAULT_SEED.as_bytes(),
             ctx.accounts.pool_state.key().as_ref(),
             ctx.accounts.token_1_mint.key().as_ref(),
             &[ctx.bumps.token_1_vault][..],
-        ][..]],
+        ],
     )?;
 
     let pool_state_loader = create_pool(
@@ -338,7 +332,7 @@ pub fn create_pool<'info>(
     token_1_mint: &AccountInfo<'info>,
     system_program: &AccountInfo<'info>,
 ) -> Result<AccountLoad<'info, PoolState>> {
-    if pool_account_info.owner != &system_program::ID || pool_account_info.lamports() != 0 {
+    if pool_account_info.owner != &system_program::ID {
         return err!(ErrorCode::NotApproved);
     }
 
@@ -356,22 +350,19 @@ pub fn create_pool<'info>(
         require_eq!(pool_account_info.is_signer, true);
     }
 
-    let cpi_accounts = anchor_lang::system_program::CreateAccount {
-        from: payer.clone(),
-        to: pool_account_info.clone(),
-    };
-    let cpi_context = CpiContext::new(system_program.to_account_info(), cpi_accounts);
-    anchor_lang::system_program::create_account(
-        cpi_context.with_signer(&[&[
+    token::create_or_allocate_account(
+        &crate::id(),
+        payer.to_account_info(),
+        system_program.to_account_info(),
+        pool_account_info.clone(),
+        &[
             POOL_SEED.as_bytes(),
             amm_config.key().as_ref(),
             token_0_mint.key().as_ref(),
             token_1_mint.key().as_ref(),
             &[bump],
-        ][..]]),
-        Rent::get()?.minimum_balance(PoolState::LEN),
-        PoolState::LEN as u64,
-        &crate::id(),
+        ],
+        PoolState::LEN,
     )?;
 
     Ok(AccountLoad::<PoolState>::try_from_unchecked(

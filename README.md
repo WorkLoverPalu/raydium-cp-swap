@@ -12,16 +12,36 @@
 
 ## 环境配置
 
-1. 安装Rust语言环境
-2. 安装Solana工具链后，执行`solana-keygen new`命令在默认路径创建密钥对
-3. 安装Anchor开发框架
+1. Install `Rust`
+
+   ```shell
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   rustup default 1.81.0
+   ```
+
+2. Install `Solana `
+
+   ```shell
+   sh -c "$(curl -sSfL https://release.anza.xyz/v2.1.0/install)"
+   ```
+
+   then run `solana-keygen new` to create a keypair at the default location.
+
+3. install `Anchor`
+
+   ```shell
+   # Installing using Anchor version manager (avm) 
+   cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+   # Install anchor
+   avm install 0.31.0
+   ```
 
 ## 快速开始
 
 克隆代码库并测试程序：
 ```shell
 git clone https://github.com/raydium-io/raydium-cp-swap
-cd raydium-cp-swap && anchor test
+cd raydium-cp-swap && yarn && anchor test
 ```
 
 ## 许可证
